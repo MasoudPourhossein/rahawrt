@@ -12,11 +12,11 @@
     "luci": "cac97ed67cfbcad90db49f5f3b1245c2c4cbfae5",
     "passwall2": "176e27cb8d9852ce9b30d2e180810b544d8fc9dc"
   },
-  "artifact_sha256": "6715c583029638c511e377980ac8952897ae48836984c398c4260bd624f1f069",
-  "payload_sha256": "4ef7591f74431f993f58d2433524fe504b7fd6858d81b7459458edc20aee9fe4",
-  "source_state": "Verified earlier development snapshot; later guest lifecycle and dashboard changes require an SDK rebuild.",
+  "artifact_sha256": "8309c7eb26f5126a935f6b11df10dd8b96c9bcfe60160e071d852857915a2b25",
+  "payload_sha256": "db1438e62ff40c93a0c63c9847049b1a0422a19123e47222b1f6503a6cae50f9",
+  "source_state": "Latest dashboard and guest lifecycle payload rebuilt and verified with the fresh pinned SDK helper.",
   "checks": {
-    "sdk_leaf": "passed for recorded payload; current-source rebuild pending",
+    "sdk_leaf": "passed for current deployment payload",
     "sdk_payload": "passed",
     "sdk_full_dependencies": "blocked: ncurses-6.4 source HTTP policy 403",
     "openwrt_uci_userspace": "passed",
@@ -29,5 +29,5 @@
   },
   "release_signature": "none; development artifact",
   "current_payload_sha256": "db1438e62ff40c93a0c63c9847049b1a0422a19123e47222b1f6503a6cae50f9",
-  "current_payload_matches_sdk": false
+  "current_payload_matches_sdk": true
 }

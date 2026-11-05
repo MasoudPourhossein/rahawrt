@@ -21,7 +21,7 @@ data. Real Chromium screenshots use seeded test devices, not a connected router:
 Guest provisioning now restarts its uhttpd listener; DHCP-only reservations no
 longer restart it. The 101-test suite, Chromium, real TLS/CGI and isolated direct
 guest lifecycle passed after this change. Current native IPK/APK packaging and
-integrity checks passed; the current-source official SDK rebuild remains pending.
+integrity checks passed; the current-source official SDK leaf rebuild also passed.
 
 ## Verified
 
@@ -37,8 +37,8 @@ integrity checks passed; the current-source official SDK rebuild remains pending
 - Real OpenWrt 24.10.8 UCI userspace transactions and rollback.
 - Native architecture-all IPK/noarch APK development packaging and native
   signature/integrity fixture checks. No release signing key was created.
-- Official x86 SDK leaf-package build for an earlier recorded payload. Final
-  source changes need another SDK build; evidence explicitly records this.
+- Official x86 SDK leaf-package build for the current dashboard and guest
+  lifecycle payload; complete bytes, metadata, permissions and ownership verified.
 
 ## Outstanding
 
