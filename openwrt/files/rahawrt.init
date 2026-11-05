@@ -1,0 +1,34 @@
+#!/bin/sh /etc/rc.common
+START=95
+STOP=10
+USE_PROCD=1
+start_service() {
+    local enabled enforce
+    config_load rahawrt
+    config_get_bool enabled main enabled 0
+    config_get_bool enforce main enforce 0
+    [ "$enabled" = 1 ] || return 0
+    if [ "$enforce" = 1 ]; then
+        PYTHONPATH=/usr/lib/rahawrt /usr/bin/python3 -m rahawrt.boot_guard install || return 1
+        procd_open_instance guard
+        procd_set_param env PYTHONPATH=/usr/lib/rahawrt
+        procd_set_param command /usr/bin/python3 -m rahawrt.boot_guard watch
+        procd_set_param respawn 3600 5 0
+        procd_set_param stderr 1
+        procd_set_param stdout 1
+        procd_close_instance
+    fi
+    procd_open_instance main
+    procd_set_param env PYTHONPATH=/usr/lib/rahawrt
+    if [ "$enforce" = 1 ]; then
+        procd_set_param command /usr/bin/python3 -m rahawrt.server --trusted-cgi --enforce
+    else
+        procd_set_param command /usr/bin/python3 -m rahawrt.server --trusted-cgi
+    fi
+    procd_set_param term_timeout 45
+    procd_set_param respawn 3600 5 3
+    procd_set_param stdout 1
+    procd_set_param stderr 1
+    procd_set_param limits core="0"
+    procd_close_instance
+}

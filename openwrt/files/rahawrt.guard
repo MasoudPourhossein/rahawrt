@@ -1,0 +1,3 @@
+#!/bin/sh
+export PYTHONPATH=/usr/lib/rahawrt
+exec /usr/bin/python3 -m rahawrt.boot_guard once

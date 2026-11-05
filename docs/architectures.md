@@ -53,12 +53,38 @@ Sources:
 
 Package architecture, target/subtarget and device model are distinct. SDK and kernel-module compatibility require exact target/release matching. The inventory does not assert availability of PassWall2 or every VPN core on every architecture.
 
-Track separately: discovered, SDK build passed, emulator tested, hardware tested. Currently every architecture is discovered only. x86 is the first planned hardware test; none has passed yet.
+Track separately: discovered, SDK build passed, emulator tested, hardware tested. The inherited inventory has not been independently refreshed. The 24.10.8 x86 SDK
+leaf package is built/verified; its full prerequisite rebuild is blocked. No
+emulator or hardware target has passed. x86 is the first physical target.
 
 Use SDK cross-builds without owning every router. Emulators can cover selected CPUs and network paths but cannot validate device Wi-Fi drivers, switch offload, flash capacity or sustained hardware throughput. Keep unsupported features disabled with an explanation.
 
 ## One-command installation contract
 
-A future versioned installer will detect OpenWrt release, package manager, package architecture, storage and existing dependencies. It must select only an explicitly supported release/architecture entry, verify signed package metadata, preserve existing settings and fail on missing dependencies. It must not automatically flash firmware or perform a distribution upgrade. Installation and later activation must remain separate, with rollback for network changes.
+`scripts/install.sh` detects OpenWrt release, package manager, package architecture, storage and existing dependencies. It selects only an explicitly supported release/architecture entry, verifies signed metadata, preserves existing settings and rejects missing prerequisites. It never flashes firmware or performs a distribution upgrade. Installation and activation are separate.
 
-No install command is published yet because no tested release artifact exists. Do not pipe a placeholder URL into a root shell.
+The documented local one-command installer requires an independently trusted key
+and signed release manifest. Unsigned development IPK/APK archives are built,
+but no signed production release or download installer URL is published.
+
+## Reproducible refresh
+
+The inventory above was present in the initial documentation. During initial
+implementation, direct retrieval from the official index returned HTTP 403 under
+the environment network policy, so these entries were **not independently
+refreshed** and no architecture has been promoted to SDK-tested support.
+
+`scripts/discover-architectures.py RELEASE` extracts architecture directories from
+the exact official HTTPS package index with TLS verification enabled and emits
+JSON with source URL and retrieval timestamp. It fails on denied/empty responses.
+For example, after allowing `downloads.openwrt.org` in environment settings:
+
+```sh
+python3 scripts/discover-architectures.py 24.10.8
+python3 scripts/discover-architectures.py 25.12.6
+```
+
+Review actual official releases/indexes before preparing a signed support
+manifest. The source package declares architecture `all`, but this does not mean
+that its dependencies, PassWall2 core or every optional VPN client are available
+on every architecture. No hand-written manifest entries are treated as tested.

@@ -1,0 +1,72 @@
+name: Validate
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  host:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: make check test build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: source-and-unsigned-architecture-all-ipk
+          path: dist/
+  nft-kernel:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y nftables iproute2
+      - run: python3 scripts/test-nft.py
+      - run: python3 scripts/test-packets.py
+      - run: python3 scripts/test-native-dns.py
+
+  browser:
+    runs-on: ubuntu-latest
+    env:
+      RAHAWRT_CHROMIUM: bundled
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --prefix .local/browser --no-save --package-lock=false playwright@1.64.1
+      - run: .local/browser/node_modules/.bin/playwright install --with-deps chromium
+      - run: node scripts/test-browser.cjs
+
+  native-packages:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: sudo apt-get update && sudo apt-get install -y build-essential pkg-config libssl-dev zlib1g-dev
+      - run: sh scripts/packaging-setup.sh
+      - run: python3 scripts/test-packages.py
+      - run: make apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: unsigned-noarch-apk-not-router-certified
+          path: dist/*.apk*
+
+  host-uhttpd:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: sudo apt-get update && sudo apt-get install -y build-essential pkg-config libssl-dev libjson-c-dev iproute2
+      - run: sh scripts/uhttpd-setup.sh
+      - run: python3 scripts/test-uhttpd.py
+      - run: python3 scripts/test-portal-flow.py
