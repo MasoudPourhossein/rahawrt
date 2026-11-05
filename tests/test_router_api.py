@@ -79,11 +79,13 @@ class RouterAPITests(unittest.TestCase):
         self.assertLess(guard,network)
         self.assertEqual(self.router.values['firewall.rw_guest.input'],'REJECT')
         self.assertEqual(self.router.values['firewall.rw_guest.forward'],'REJECT')
+        self.assertTrue(any(a==['/etc/init.d/uhttpd','restart'] for a,d in calls))
 
     def test_dhcp_reservation_requires_confirmation(self):
         status,result=self.request('reservations','POST',dict(device='phone'))
         self.assertEqual(status,202);self.confirm(result)
         self.assertEqual(self.router.values['dhcp.rw_phone.mac'],'02:11:22:33:44:55')
+        self.assertFalse(any(a==['/etc/init.d/uhttpd','restart'] for a,d in self.router.calls))
         self.assertEqual(self.request('reservations','POST',dict(device='phone'))[0],400)
 
     def test_preview_cannot_mutate_router_and_admin_can_save_profiles(self):

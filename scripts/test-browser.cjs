@@ -12,7 +12,7 @@ const directory=fs.mkdtempSync(path.join(os.tmpdir(),'rahawrt-browser-'));
 const db=path.join(directory,'state.db');
 const password=crypto.randomBytes(24).toString('base64url');
 const python=process.env.RAHAWRT_PYTHON || 'python3';
-const seed=spawnSync(python,['-c',"import sys; from rahawrt.store import Store; s=Store(sys.argv[1]); s.account('owner',sys.stdin.read(),'admin'); s.db.close()",db],{cwd:root,input:password});
+const seed=spawnSync(python,['-c',"import sys; from rahawrt.store import Store; s=Store(sys.argv[1]); s.account('owner',sys.stdin.read(),'admin'); fixtures=[('laptop','لپ‌تاپ مدیریت',10,128,1400),('phone','تلفن همراه',11,64,860),('tv','تلویزیون',12,32,2400)]; [(s.put_device(dict(id=i,name=n,ip='192.168.1.'+str(a),mac='02:00:00:00:01:'+format(a,'02x'),quota_bytes=5*1024**3)),s.add_usage({i:(u*1024**2,d*1024**2)})) for i,n,a,u,d in fixtures]; s.db.close()",db],{cwd:root,input:password});
 assert.equal(seed.status,0,'seed failed');
 const server=spawn(python,['-m','rahawrt.server','--db',db,'--web',path.join(root,'web'),'--port','19081'],{cwd:root,stdio:'ignore'});
 (async()=>{
@@ -40,6 +40,17 @@ const server=spawn(python,['-m','rahawrt.server','--db',db,'--web',path.join(roo
     [response]=await Promise.all([page.waitForResponse(r=>r.url().endsWith('/issue')),page.locator('#issue-form button').click()]);
     const replay=await response.json();assert.equal(replay.created,false);assert.equal(replay.username,issued.username);assert.equal(replay.password,null);
     await page.locator('#clear-vouchers').click();await page.locator('#print-vouchers').waitFor({state:'hidden'});
+    assert.equal(await page.locator('#resources .metric').count(),6);
+    assert.equal(await page.locator('#devices tr').count(),3);
+    assert.equal(await page.locator('#policy-debug').isVisible(),false);
+    assert.equal(await page.locator('#accounts-list table').count(),1);
+    fs.mkdirSync(path.join(root,'.local/screenshots'),{recursive:true});
+    await page.setViewportSize({width:1500,height:1080});
+    await page.locator('#language').click();
+    await page.evaluate(()=>window.scrollTo(0,0));
+    await page.screenshot({path:path.join(root,'.local/screenshots/dashboard-fa-desktop.png'),fullPage:false});
+    await page.locator('#language').click();
+    await page.screenshot({path:path.join(root,'.local/screenshots/dashboard-en-desktop.png'),fullPage:false});
     await page.locator('#account [name=name]').fill('operator');await page.locator('#account [name=password]').fill(password);await page.locator('#account [name=role]').selectOption('operator');
     await Promise.all([page.waitForResponse(r=>r.url().endsWith('/accounts')&&r.request().method()==='POST'),page.locator('#account button').click()]);
     await page.locator('#logout').click();await page.locator('#login').waitFor({state:'visible'});
@@ -49,7 +60,13 @@ const server=spawn(python,['-m','rahawrt.server','--db',db,'--web',path.join(roo
     await page.setViewportSize({width:390,height:844});
     await page.locator('#language').click();assert.equal(await page.locator('html').getAttribute('dir'),'rtl');
     fs.mkdirSync(path.join(root,'.local/screenshots'),{recursive:true});
-    await page.screenshot({path:path.join(root,'.local/screenshots/operator-mobile.png'),fullPage:true});
+    await page.screenshot({path:path.join(root,'.local/screenshots/operator-mobile.png'),fullPage:false});
+    await page.evaluate(()=>fetch('/cgi-bin/rahawrt/wrt/api/v1/logout',{method:'POST',headers:{'Content-Type':'application/json','X-RahaWRT-Request':'1','X-HTTP-Method-Override':'POST'},body:'{}'}));
+    await page.locator('#refresh').click();await page.locator('#login').waitFor({state:'visible'});
+    assert.equal(await page.locator('#dashboard').isVisible(),false);
+    assert.equal(await page.locator('#navigation').isVisible(),false);
+    assert.equal(await page.locator('#accounts-list').textContent(),'');
+    assert.equal(await page.locator('#policy-debug').textContent(),'');
     assert.deepEqual(errors,[],'browser runtime errors');
     console.log('PASS: Chromium RTL/LTR, real login, plan creation, invoice issuance/retry, secret clearing, operator permissions and mobile rendering.');
   } finally {

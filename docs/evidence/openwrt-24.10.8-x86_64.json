@@ -14,7 +14,7 @@
   },
   "artifact_sha256": "6715c583029638c511e377980ac8952897ae48836984c398c4260bd624f1f069",
   "payload_sha256": "4ef7591f74431f993f58d2433524fe504b7fd6858d81b7459458edc20aee9fe4",
-  "source_state": "Verified earlier development snapshot; later guest discovery and cleanup changes require an SDK rebuild.",
+  "source_state": "Verified earlier development snapshot; later guest lifecycle and dashboard changes require an SDK rebuild.",
   "checks": {
     "sdk_leaf": "passed for recorded payload; current-source rebuild pending",
     "sdk_payload": "passed",
@@ -28,6 +28,6 @@
     "latest_complete_workflow_rerun": "not executed: automatic approval review unavailable due usage limit"
   },
   "release_signature": "none; development artifact",
-  "current_payload_sha256": "4bc006f0ff17f45619cd0515bd9c19fccc6361db8be81af0bfe2d6711c24ffb0",
+  "current_payload_sha256": "db1438e62ff40c93a0c63c9847049b1a0422a19123e47222b1f6503a6cae50f9",
   "current_payload_matches_sdk": false
 }

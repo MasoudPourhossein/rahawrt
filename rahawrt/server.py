@@ -119,9 +119,9 @@ class Handler(BaseHTTPRequestHandler):
         path = self.path.split('?')[0]
         if path.startswith('/cgi-bin/rahawrt/'):
             path = path[len('/cgi-bin/rahawrt'):]
-        if self.command == 'GET' and path in ('/wrt/', '/wrt/app.js', '/wrt/style.css'):
-            name = {'/wrt/': 'index.html', '/wrt/app.js': 'app.js', '/wrt/style.css': 'style.css'}[path]
-            mime = {'index.html': 'text/html', 'app.js': 'text/javascript', 'style.css': 'text/css'}[name]
+        if self.command == 'GET' and path in ('/wrt/', '/wrt/app.js', '/wrt/dashboard.js', '/wrt/style.css'):
+            name = {'/wrt/': 'index.html', '/wrt/app.js': 'app.js', '/wrt/dashboard.js': 'dashboard.js', '/wrt/style.css': 'style.css'}[path]
+            mime = {'index.html': 'text/html', 'app.js': 'text/javascript', 'dashboard.js': 'text/javascript', 'style.css': 'text/css'}[name]
             return self.reply(200, (s.web/name).read_bytes(), content_type=mime)
         if not path.startswith('/wrt/api/v1/'):
             return self.reply(404, {'error': 'not found'})
@@ -202,7 +202,7 @@ class Handler(BaseHTTPRequestHandler):
             section='rw_'+d['id']
             if 'dhcp.'+section+'=' in current:raise ValueError('reservation section already exists')
             sections={'dhcp':{section:dict(type='host',options=dict(name=d['id'].replace('_','-').lower(),mac=d['mac'],ip=d['ip'],leasetime='infinite'))}}
-            return self.reply(202,s.changes.start('reservation',sections,[['/etc/init.d/dnsmasq','restart'],['/etc/init.d/uhttpd','restart']],name))
+            return self.reply(202,s.changes.start('reservation',sections,[['/etc/init.d/dnsmasq','restart']],name))
         if path=='/wrt/api/v1/tunnels' and self.command=='GET':
             permitted('',('admin','operator'))
             with s.store.lock:
@@ -301,7 +301,7 @@ class Handler(BaseHTTPRequestHandler):
                         raise ValueError('guest section already exists; refusing to overwrite it')
             if data.get('radio'):
                 s.runtime.run(['uci','-q','get','wireless.'+data['radio']])
-            reloads=[['/etc/init.d/network','reload'],['/etc/init.d/firewall','restart'],['/etc/init.d/dnsmasq','restart']]
+            reloads=[['/etc/init.d/network','reload'],['/etc/init.d/firewall','restart'],['/etc/init.d/dnsmasq','restart'],['/etc/init.d/uhttpd','restart']]
             if data.get('radio'):reloads.append(['wifi','reload'])
             bootstrap=bootstrap_rules(data['address'])
             s.runtime.run(['nft','-c','-f','-'],bootstrap)

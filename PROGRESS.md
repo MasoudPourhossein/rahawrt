@@ -9,6 +9,20 @@ parental DNS, guest provisioning and captive portal, voucher/accounting API,
 reports, optional native-tunnel provisioning/source routes, backup/rollback and
 independent enforcement guards. See README.md and docs/api.md for exact scope.
 
+## Dashboard update
+
+The overview now has Persian/English navigation, six API-backed status/resource
+cards, readable device/usage tables and role-aware account/report views. Technical
+policy details are collapsed. Session expiry clears authenticated views and cached
+data. Real Chromium screenshots use seeded test devices, not a connected router:
+[Persian dashboard](docs/screenshots/dashboard-fa-desktop.png),
+[English dashboard](docs/screenshots/dashboard-en-desktop.png).
+
+Guest provisioning now restarts its uhttpd listener; DHCP-only reservations no
+longer restart it. The 101-test suite, Chromium, real TLS/CGI and isolated direct
+guest lifecycle passed after this change. Current native IPK/APK packaging and
+integrity checks passed; the current-source official SDK rebuild remains pending.
+
 ## Verified
 
 - 101 Python/HTTP/CGI/DNS/SQLite tests.

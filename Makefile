@@ -12,6 +12,7 @@ check:
 	python3 -m compileall -q rahawrt tests scripts
 	python3 -c "compile(open('openwrt/files/rahawrt.cgi').read(),'rahawrt.cgi','exec')"
 	node --check web/app.js
+	node --check web/dashboard.js
 	node --check scripts/test-browser.cjs
 	sh -n scripts/install.sh
 	sh -n scripts/router.sh

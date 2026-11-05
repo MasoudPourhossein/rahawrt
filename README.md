@@ -69,3 +69,11 @@ produces the portable source archive and an architecture-all IPK; after
 `python3 scripts/test-packages.py` checks the official IPK payload and native APK
 signature/integrity behavior with temporary fixture keys. These archives are
 unsigned development artifacts, not published or hardware-certified releases.
+
+### Dashboard screenshots
+
+Real Chromium captures with seeded test devices and usage. Resources belong to
+the preview host; these images do not demonstrate a connected OpenWrt router.
+
+- [Persian dashboard](docs/screenshots/dashboard-fa-desktop.png)
+- [English dashboard](docs/screenshots/dashboard-en-desktop.png)
